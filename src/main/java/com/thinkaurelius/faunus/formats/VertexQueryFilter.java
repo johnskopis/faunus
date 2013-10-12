@@ -75,26 +75,21 @@ public class VertexQueryFilter extends DefaultVertexQuery {
     public void defaultFilter(final FaunusVertex vertex) {
         if (!this.doesFilter) return;
         vertex.removeEdges(Tokens.Action.KEEP, this.direction, this.labels);
-        Iterator<Edge> itty;
+        Iterator<Edge> itty = vertex.getEdges(this.direction).iterator();
         Edge edge;
-        if (this.hasContainers.size() > 0) {
-            itty = vertex.getEdges(this.direction).iterator();
-            while (itty.hasNext()) {
-                edge = itty.next();
-                for (final HasContainer hasContainer : this.hasContainers) {
-                    if (!hasContainer.isLegal(edge))
-                        itty.remove();
-                }
-            }
-        }
-        if (this.limit != Long.MAX_VALUE) {
-            itty = vertex.getEdges(this.direction).iterator();
-            long counter = 0;
-            while (itty.hasNext()) {
-                itty.next();
-                if (++counter > this.limit)
+        while (itty.hasNext()) {
+            edge = itty.next();
+            for (final HasContainer hasContainer : this.hasContainers) {
+                if (!hasContainer.isLegal(edge))
                     itty.remove();
             }
+        }
+        itty = vertex.getEdges(this.direction).iterator();
+        long counter = 0;
+        while (itty.hasNext()) {
+            itty.next();
+            if (++counter > this.limit)
+                itty.remove();
         }
     }
 
